@@ -3,6 +3,8 @@
 from typing import List
 import re
 import logging
+import os
+import mysql.connector
 
 
 PII_FIELDS = ("name", "email", "phone", "ssn", "password")
@@ -27,17 +29,6 @@ def filter_datum(fields: List[str], redaction: str,
     return message
 
 
-def get_logger() -> logging.Logger:
-        """Returns a logging.Logger object."""
-        logger = logging.getLogger("user_data")
-        logger.setLevel(logging.INFO)
-        logger.propagate = False
-        handler = logging.StreamHandler()
-        handler.setFormatter(logging.Formatter(RedactingFormatter(PII_FIELDS)))
-        logger.addHandler(handler)
-        return logger
-
-
 class RedactingFormatter(logging.Formatter):
     """ Redacting Formatter class
         """
@@ -55,3 +46,42 @@ class RedactingFormatter(logging.Formatter):
         """filter values in incoming log records using filter_datum"""
         return filter_datum(self.fields, self.REDACTION,
                             super().format(record), self.SEPARATOR)
+
+
+def get_logger() -> logging.Logger:
+    """Returns a logging.Logger object."""
+    logger = logging.getLogger("user_data")
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+    handler = logging.StreamHandler()
+    handler.setFormatter(logging.Formatter(RedactingFormatter(PII_FIELDS)))
+    logger.addHandler(handler)
+    return logger
+
+
+def get_db() -> mysql.connector.connection.MySQLConnection:
+    """Returns a connector to the database"""
+    psw = os.environ.get("PERSONAL_DATA_DB_PASSWORD", "")
+    username = os.environ.get('PERSONAL_DATA_DB_USERNAME', "root")
+    host = os.environ.get('PERSONAL_DATA_DB_HOST', 'localhost')
+    db_name = os.environ.get('PERSONAL_DATA_DB_NAME')
+    my_connection = mysql.connector.connect(
+        host=host,
+        database=db_name,
+        user=username,
+        password=psw)
+    return my_connection
+
+
+if __name__ == '__main__':
+    connection = get_db()
+    cursor = connection.cursor(dictionary=True)
+    query = ("SELECT * FROM users")
+    cursor.execute(query)
+    for row in cursor:
+        string = ""
+        for key in row:
+            string += "{}={}; ".format(key, row[key])
+        print(string)
+    cursor.close()
+    connection.close()
