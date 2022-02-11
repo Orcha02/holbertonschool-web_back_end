@@ -7,6 +7,7 @@ import logging
 
 PII_FIELDS = ("name", "email", "phone", "ssn", "password")
 
+
 def filter_datum(fields: List[str], redaction: str,
                  message: str, separator: str) -> str:
     """
@@ -24,6 +25,7 @@ def filter_datum(fields: List[str], redaction: str,
         pattern = info + "=.+?(?=abc)*\\" + ";"
         message = re.sub(pattern, info + "=" + redaction + separator, message)
     return message
+
 
 def get_logger() -> logging.Logger:
         """Returns a logging.Logger object."""
