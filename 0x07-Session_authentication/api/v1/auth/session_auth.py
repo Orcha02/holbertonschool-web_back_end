@@ -2,6 +2,7 @@
 """First step for creating a new authentication mechanism"""
 from api.v1.auth.auth import Auth
 import uuid
+from models.user import User
 
 
 class SessionAuth(Auth):
@@ -19,11 +20,15 @@ class SessionAuth(Auth):
         return session_id
 
     def user_id_for_session_id(self, session_id: str = None) -> str:
-        """
-        user_id_for_session_id function
-        """
+        """ user_id_for_session_id function """
         if session_id is None:
             return None
         if type(session_id) is None:
             return None
         return SessionAuth.user_id_by_session_id.get(session_id)
+
+    def current_user(self, request=None):
+        """ Returns a User instance based on a cookie value """
+        cookie_val = self.session_cookie(request)
+        user_id = self.user_id_for_session_id(cookie_val)
+        return User.get(user_id)
