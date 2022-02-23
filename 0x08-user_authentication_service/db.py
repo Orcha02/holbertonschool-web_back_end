@@ -1,27 +1,31 @@
 #!/usr/bin/env python3
-""" DB module """
+""" Database module """
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm.session import Session
-from typing import TypeVar
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm import sessionmaker
+from typing import TypeVar
 
 from user import Base, User
 
 
 class DB:
-    """ DB class """
-    def __init__(self) -> None:
-        """ Constructor """
+    """ Database class
+        Creates engine, session, adds user object to DB
+        Methods:
+            add_user - save the user object to the database
+            find_user_by - returns the first row found in the users table
+    """
+    def __init__(self):
+        """ Constructor"""
         self._engine = create_engine("sqlite:///a.db")
         Base.metadata.drop_all(self._engine)
         Base.metadata.create_all(self._engine)
         self.__session = None
 
     @property
-    def _session(self) -> Session:
-        """Create session """
+    def _session(self):
+        """ Create session """
         if self.__session is None:
             DBSession = sessionmaker(bind=self._engine)
             self.__session = DBSession()
