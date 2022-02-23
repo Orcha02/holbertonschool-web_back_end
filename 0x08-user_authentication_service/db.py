@@ -1,39 +1,38 @@
 #!/usr/bin/env python3
-""" Database module """
+"""DB module
+"""
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm import sessionmaker
-from typing import TypeVar
+from sqlalchemy.orm.session import Session
 
 from user import Base, User
 
 
 class DB:
-    """ Database class
-        Creates engine, session, adds user object to DB
-        Methods:
-            add_user - save the user object to the database
-            find_user_by - returns the first row found in the users table
+    """DB class
     """
-    def __init__(self):
-        """ Constructor"""
-        self._engine = create_engine("sqlite:///a.db")
+
+    def __init__(self) -> None:
+        """Initialize a new DB instance
+        """
+        self._engine = create_engine("sqlite:///a.db", echo=False)
         Base.metadata.drop_all(self._engine)
         Base.metadata.create_all(self._engine)
         self.__session = None
 
     @property
-    def _session(self):
-        """ Create session """
+    def _session(self) -> Session:
+        """Memoized session object
+        """
         if self.__session is None:
             DBSession = sessionmaker(bind=self._engine)
             self.__session = DBSession()
         return self.__session
 
-    def add_user(self, email: str, hashed_password: str) -> TypeVar('User'):
-        """ Add a user instance to the session DB """
-        user = User(email=email, hashed_password=hashed_password)
-        self._session.add(user)
+    def add_user(self, email: str, hashed_password: str) -> User:
+        """ Add a user to the DataBase. """
+        new_user = User(email=email, hashed_password=hashed_password)
+        self._session.add(new_user)
         self._session.commit()
-        return user
+        return new_user
