@@ -14,6 +14,10 @@ def _hash_password(password: str) -> str:
     """
     return bcrypt.hashpw(bytes(password, 'utf-8'), bcrypt.gensalt())
 
+def _generate_uuid() -> str:
+    """Returns a string representation of a new UUID.
+    """
+    return str(uuid.uuid1())
 
 class Auth:
     """Auth class to interact with the authentication database.
@@ -46,8 +50,7 @@ class Auth:
         """
         try:
             user = self._db.find_user_by(email=email)
-            if user:
-                passwhash = _hash_password(password)
-                return bcrypt.checkpw(password.encode('utf-8'), passwhash)
-        except NoResultFound:
+             password = password.encode("utf-8")
+            return (bcrypt.checkpw(password, user.hashed_password))
+        except Exception:
             return False
