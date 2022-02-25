@@ -7,8 +7,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 
 def _hash_password(password: str) -> str:
-    """
-    takes in a password string arguments and returns a string.
+    """takes in a password string arguments and returns a string.
     The string is a salted hash of the input password,
     hashed with bcrypt.hashpw.
     """
