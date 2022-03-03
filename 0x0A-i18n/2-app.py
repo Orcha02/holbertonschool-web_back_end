@@ -2,25 +2,25 @@
 """ Basic Flask app """
 from flask import Flask, render_template
 from flask_babel import Babel
-from os import getenv
+
 
 app = Flask(__name__)
 babel = Babel(app)
 
 
 class Config(object):
-    """ Babel config class """
-    LANGUAGES = ["en", "fr"]
-    Babel.default_locale = 'en'
-    Babel.default_timezone = 'UTC'
+    """ Config Class."""
+    LANGUAGES = ['en', 'fr']
+    BABEL_DEFAULT_LOCALE = 'en'
+    BABEL_DEFAULT_TIMEZONE = 'UTC'
 
 
 app.config.from_object(Config)
 
 
-@app.route("/", methods=["GET"])
+@app.route('/')
 def index():
-    """ Returns index """
+    """Render index.html."""
     return render_template("2-index.html")
 
 
