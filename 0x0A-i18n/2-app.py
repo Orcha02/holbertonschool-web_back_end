@@ -11,14 +11,14 @@ babel = Babel(app)
 class Config(object):
     """ Config Class."""
     LANGUAGES = ['en', 'fr']
-    BABEL_DEFAULT_LOCALE = 'en'
-    BABEL_DEFAULT_TIMEZONE = 'UTC'
+    Babel.default_locale = 'en'
+    Babel.default_timezone = 'UTC'
 
 
 app.config.from_object(Config)
 
 
-@app.route('/')
+@app.route("/", methods=["GET"])
 def index():
     """Render index.html."""
     return render_template("2-index.html")
@@ -27,7 +27,7 @@ def index():
 @babel.localeselector
 def get_locale():
     """ Determine the best match with our supported languages """
-    return request.accept_languages.best_match(app.config['LANGUAGES'])
+    return request.accept_languages.best_match(Config.LANGUAGES)
 
 
 if __name__ == "__main__":
