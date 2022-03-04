@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" Flask App """
+""" Flask app """
 from flask import Flask, render_template, request
 from os import getenv
 from flask_babel import Babel
@@ -22,12 +22,15 @@ app.config.from_object(Config)
 @app.route('/')
 def index():
     """Render index.html."""
-    return render_template("3-index.html")
+    return render_template("4-index.html")
 
 
 @babel.localeselector
 def get_locale():
     """Determine the bestmatch languages."""
+    locale = request.args.get('locale')
+    if locale in app.config['LANGUAGES']:
+        return locale
     return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
