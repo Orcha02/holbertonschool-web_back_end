@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 """
 Writing strings to Redis, Reading from Redis and recovering original type,
