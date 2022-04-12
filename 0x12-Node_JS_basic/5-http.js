@@ -1,31 +1,26 @@
 const http = require('http');
 const countStudents = require('./3-read_file_async');
 
-const port = 1245;
-
-// create a server object
 const app = http.createServer((req, res) => {
-  const { method, url } = req;
-  if (method === 'GET' && url === '/') {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    res.write('Hello Holberton School!'); // write a response to the client
-    res.end();
-  }
-  if (method === 'GET' && url === '/students') {
-    countStudents(String(process.argv.slice(2)))
-      .then((arrayOfClasses) => {
-        res.write('This is the list of our students\n'); // write a response to the client
-        res.write(`Number of students: ${arrayOfClasses.count}\n`);
-        for (const cls in arrayOfClasses) {
-          if (cls && cls !== 'count') res.write(`Number of students in ${cls}: ${arrayOfClasses[cls].length}. List: ${arrayOfClasses[cls].join(', ')}\n`);
+  if (req.url === '/') {
+    res.end('Hello Holberton School!');
+  } else if (req.url === '/students') {
+    countStudents(process.argv[2])
+      .then((data) => {
+        let num = 0;
+        let response = '';
+        for (const [key, value] of Object.entries(data)) {
+          num += value.length;
+          response += `Number of students in ${key}: ${value.length}. List: ${value.join(', ')}\n`;
         }
-        res.end(); // end the response
+        response = `This is the list of our students\nNumber of students: ${num}\n${response.slice(0, -1)}`;
+        res.end(response);
       })
-      .catch((err) => { throw err; });
+      .catch((error) => {
+        res.end(`This is the list of our students\n${error.message}`);
+      });
+  // res.end(`This is the list of our students ${dict}`);
   }
 });
-
-app.listen(port);
-
+app.listen(1245);
 module.exports = app;
